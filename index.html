@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aventura de Escapada</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background: #121212;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #game {
+            width: 600px;
+            height: 400px;
+            background: #1f1f1f;
+            border: 4px solid #888;
+            padding: 1rem;
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            position: relative; /* Añadido para posicionar el botón de reinicio */
+        }
+
+        .dialogo {
+            margin: 1rem 0;
+        }
+
+        .opciones button {
+            display: block;
+            margin: 0.5rem 0;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            background: #282828;
+            color: #fff;
+            border: 1px solid #555;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .opciones button:hover {
+            background: #444;
+        }
+        
+        /* Estilo para el nuevo botón de volver a jugar */
+        #replay-button {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background: #5e3a8a;
+            color: #fff;
+            border: 1px solid #8e6ec2;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 5px;
+        }
+
+        #replay-button:hover {
+            background: #7648b1;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔮 El Viaje Comienza</h1>
+    <div id="game"></div>
+
+    <script>
+        const juego = document.getElementById('game');
+
+        const historia = [
+            {
+                texto: 'Despiertas en una biblioteca encantada. Un pergamino flota frente a ti. Dice: "Cada elección que hagas revelará tu destino". ¿Qué haces primero?',
+                opciones: [
+                    { texto: 'Explorar la sala del fondo con luces cálidas', atributo: 'acogedor', siguiente: 1 },
+                    { texto: 'Subir por una escalera estrecha hacia un balcón oscuro', atributo: 'misterioso', siguiente: 2 }
+                ]
+            },
+            {
+                texto: 'En la sala hay una chimenea, un sofá antiguo y un libro titulado "El descanso del viajero". También hay una ventana con vistas a un jardín nevado.',
+                opciones: [
+                    { texto: 'Sentarte a leer el libro', atributo: 'tranquilo', siguiente: 3 },
+                    { texto: 'Observar el jardín desde la ventana', atributo: 'naturaleza', siguiente: 4 }
+                ]
+            },
+            {
+                texto: 'Desde el balcón ves una torre lejana y un camino de piedras. Hay una cuerda que baja a un callejón.',
+                opciones: [
+                    { texto: 'Ir hacia la torre', atributo: 'historia', siguiente: 4 },
+                    { texto: 'Bajar al callejón', atributo: 'urbano', siguiente: 5 }
+                ]
+            },
+            {
+                texto: 'El libro te transporta a una escena con aroma a café, música suave y alguien sirviendo un desayuno casero.',
+                opciones: [
+                    { texto: 'Unirte a la mesa y disfrutar del momento', atributo: 'relax', siguiente: 6 },
+                    { texto: 'Explorar la cocina y ver cómo lo preparan', atributo: 'curioso', siguiente: 6 }
+                ]
+            },
+            {
+                texto: 'Encuentras un elfo doméstico que te ofrece dos objetos: una brújula oxidada y una flor azul brillante.',
+                opciones: [
+                    { texto: 'Tomar la brújula', atributo: 'aventura', siguiente: 6 },
+                    { texto: 'Tomar la flor', atributo: 'emocional', siguiente: 7 }
+                ]
+            },
+            {
+                texto: 'En el callejón Jean Michel Basquiat pinta un mural. Te ofrece un pincel y dice: "Pinta lo que quieras ver".',
+                opciones: [
+                    { texto: 'Pintar un paisaje salvaje', atributo: 'naturaleza', siguiente: 7 },
+                    { texto: 'Pintar un rincón de ciudad con vida', atributo: 'ciudad', siguiente: 7 }
+                ]
+            },
+            {
+                texto: 'Una voz en el aire susurra: "Quedan pocos pasos... Sigue lo que te haga sentir viva". Hay una puerta con luz y otra con sombra.',
+                opciones: [
+                    { texto: 'Cruzar la puerta con luz', atributo: 'luz', siguiente: 8 },
+                    { texto: 'Entrar en la puerta sombría', atributo: 'sombra', siguiente: 8 }
+                ]
+            },
+            {
+                texto: 'Al tomar el objeto, todo a tu alrededor empieza a girar. Una melodía antigua te guía hacia un túnel iluminado por luciérnagas.',
+                opciones: [
+                    { texto: 'Seguir la melodía', atributo: 'fantasía', siguiente: 8 },
+                    { texto: 'Explorar un sendero lateral entre árboles', atributo: 'retirada', siguiente: 8 }
+                ]
+            },
+            {
+                texto: 'Tu viaje está a punto de revelarte un lugar especial. El aire cambia, huele a nuevo y a antiguo a la vez. Sientes que todo encaja.',
+                opciones: [
+                    { texto: 'Descubrir el destino', siguiente: 'resultado' }
+                ]
+            }
+        ];
+
+        let estado = {
+            atributos: []
+        };
+
+        function mostrarPaso(paso) {
+            if (paso === 'resultado') {
+                mostrarResultado();
+                return;
+            }
+            const escena = historia[paso];
+            juego.innerHTML = `
+                <div class="dialogo">
+                  <p>${escena.texto}</p>
+                </div>
+                <div class="opciones"></div>
+              `;
+            const contenedorOpciones = juego.querySelector('.opciones');
+            escena.opciones.forEach(op => {
+                const btn = document.createElement('button');
+                btn.textContent = op.texto;
+                btn.onclick = () => {
+                    if (op.atributo) estado.atributos.push(op.atributo);
+                    mostrarPaso(op.siguiente);
+                };
+                contenedorOpciones.appendChild(btn);
+            });
+        }
+
+        function mostrarResultado() {
+            const puntos = estado.atributos.reduce((acc, atr) => {
+                acc[atr] = (acc[atr] || 0) + 1;
+                return acc;
+            }, {});
+
+            let destino = 'Puy du fou';
+
+            if (puntos.tranquilo && puntos.naturaleza) destino = 'Sierra de Cazorla 🌲';
+            else if (puntos.ciudad && puntos.urbano) destino = 'Málaga 🐟';
+            else if (puntos.historia && puntos.misterioso) destino = 'Córdoba 🕌';
+            else if (puntos.relax && puntos.acogedor) destino = 'Sierra de Aracena 🛏️';
+            else if (puntos.aventura && puntos.fantasia) destino = 'Comunidad Valenciana 🏙️';
+            else if (puntos.emocional && puntos.retirada) destino = 'Baños termanles de Granada 🌄';
+            else if (puntos.acogedor && puntos.curioso) destino = 'Un café de especialidad en Oporto 📚';
+            else if (puntos.acogedor && puntos.aventura) destino = 'Ruta por Sierra Nevada 🚐';
+            else if (puntos.naturaleza && puntos.fantasia) destino = 'Bosques de la Sierra de las Nieves 🧚';
+            else if (puntos.urbano && puntos.naturaleza) destino = 'El Parque del Retiro de Madrid 🌳';
+
+            juego.innerHTML = `
+                <h2>✨ Tu destino ha sido revelado</h2>
+                <p style="font-size: 1.5rem; color: #f582ae">${destino}</p>
+              `;
+
+            // Crear y añadir el botón de reinicio
+            const replayBtn = document.createElement('button');
+            replayBtn.textContent = 'Volver a jugar';
+            replayBtn.id = 'replay-button'; // Asignar ID para el CSS
+            replayBtn.onclick = () => {
+                // Reiniciar el estado y empezar de nuevo
+                estado.atributos = [];
+                mostrarPaso(0);
+            };
+
+            juego.appendChild(replayBtn);
+        }
+
+        mostrarPaso(0);
+    </script>
+</body>
+
+</html>
