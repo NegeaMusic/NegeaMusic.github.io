@@ -217,7 +217,8 @@
             else if (puntos.urbano && puntos.naturaleza) destino = 'El Parque del Retiro de Madrid 🌳';
             juego.innerHTML = `
                 <h2>✨ Tu destino ha sido revelado</h2>
-                <p style="font-size:1.5rem; color:#f582ae">${destino}\n</p>`;
+                <p style="font-size:1.5rem; color:#f582ae">${destino}</p>
+                <p></p>`;
             const btn = document.createElement('button');
             btn.id = 'replay-button'; btn.textContent = 'Volver a jugar';
             btn.onclick = () => { estado.atributos = []; mostrarPaso(0); };
