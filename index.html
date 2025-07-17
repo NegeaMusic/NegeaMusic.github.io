@@ -69,7 +69,7 @@
 
         #replay-button {
             position: absolute;
-            bottom: 1rem;
+            bottom: 2rem; /* aumentado para no superponerse */
             right: 1rem;
             padding: 0.5rem 1rem;
             font-size: 0.9rem;
@@ -103,6 +103,7 @@
                 padding: 0.5rem 0.75rem;
             }
             #replay-button {
+                bottom: 1.5rem; /* ligero ajuste en móvil */
                 font-size: 0.8rem;
                 padding: 0.4rem 0.8rem;
             }
@@ -209,7 +210,7 @@
             else if (puntos.historia && puntos.misterioso) destino = 'Córdoba 🕌';
             else if (puntos.relax && puntos.acogedor) destino = 'Sierra de Aracena 🛏️';
             else if (puntos.aventura && puntos.fantasía) destino = 'Comunidad Valenciana 🏙️';
-            else if (puntos.emocional && puntos.retirada) destino = 'Baños termanles de Granada 🌄';
+            else if (puntos.emocional && puntos.retirada) destino = 'Baños termales de Granada 🌄';
             else if (puntos.acogedor && puntos.curioso) destino = 'Un café de especialidad en Oporto 📚';
             else if (puntos.acogedor && puntos.aventura) destino = 'Ruta por Sierra Nevada 🚐';
             else if (puntos.naturaleza && puntos.fantasía) destino = 'Bosques de la Sierra de las Nieves 🧚';
