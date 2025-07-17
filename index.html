@@ -37,6 +37,7 @@
             background: #1f1f1f;
             border: 4px solid #888;
             padding: 1rem;
+            padding-bottom: 4rem;
             overflow-y: auto;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
             position: relative;
@@ -68,10 +69,12 @@
         }
 
         #replay-button {
-            position: relative;
+            position: absolute;
             /* quita el absolute */
-            display: none;
-            /* lo mostramos solo al final */
+            bottom: 1rem;
+            /* <- ahora sí estará dentro del área visible */
+            right: 1rem;
+            z-index: 10;
             margin: 1rem auto 0;
             padding: 0.5rem 1rem;
             font-size: 0.9rem;
