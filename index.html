@@ -19,41 +19,54 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
         }
 
         #game {
-            width: 600px;
-            height: 400px;
+            width: 90%;
+            max-width: 600px;
+            height: 70vh;
+            max-height: 400px;
             background: #1f1f1f;
             border: 4px solid #888;
             padding: 1rem;
             overflow-y: auto;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-            position: relative; /* Añadido para posicionar el botón de reinicio */
+            position: relative;
+            border-radius: 8px;
         }
 
-        .dialogo {
-            margin: 1rem 0;
+        .dialogo p {
+            margin: 0 0 1rem;
+            line-height: 1.4;
+            font-size: 1rem;
         }
 
         .opciones button {
             display: block;
+            width: 100%;
             margin: 0.5rem 0;
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1rem;
             font-size: 1rem;
             background: #282828;
             color: #fff;
             border: 1px solid #555;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background 0.2s ease;
         }
 
         .opciones button:hover {
             background: #444;
         }
-        
-        /* Estilo para el nuevo botón de volver a jugar */
+
         #replay-button {
             position: absolute;
             bottom: 1rem;
@@ -63,13 +76,36 @@
             background: #5e3a8a;
             color: #fff;
             border: 1px solid #8e6ec2;
-            cursor: pointer;
-            transition: all 0.2s ease;
             border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s ease;
         }
 
         #replay-button:hover {
             background: #7648b1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            #game {
+                height: auto;
+                max-height: none;
+                padding: 0.75rem;
+            }
+            .dialogo p {
+                font-size: 0.9rem;
+            }
+            .opciones button {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+            }
+            #replay-button {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
         }
     </style>
 </head>
@@ -146,23 +182,14 @@
             }
         ];
 
-        let estado = {
-            atributos: []
-        };
+        let estado = { atributos: [] };
 
         function mostrarPaso(paso) {
-            if (paso === 'resultado') {
-                mostrarResultado();
-                return;
-            }
+            if (paso === 'resultado') return mostrarResultado();
             const escena = historia[paso];
             juego.innerHTML = `
-                <div class="dialogo">
-                  <p>${escena.texto}</p>
-                </div>
-                <div class="opciones"></div>
-              `;
-            const contenedorOpciones = juego.querySelector('.opciones');
+                <div class="dialogo"><p>${escena.texto}</p></div>
+                <div class="opciones"></div>`;
             escena.opciones.forEach(op => {
                 const btn = document.createElement('button');
                 btn.textContent = op.texto;
@@ -170,45 +197,30 @@
                     if (op.atributo) estado.atributos.push(op.atributo);
                     mostrarPaso(op.siguiente);
                 };
-                contenedorOpciones.appendChild(btn);
+                juego.querySelector('.opciones').appendChild(btn);
             });
         }
 
         function mostrarResultado() {
-            const puntos = estado.atributos.reduce((acc, atr) => {
-                acc[atr] = (acc[atr] || 0) + 1;
-                return acc;
-            }, {});
-
+            const puntos = estado.atributos.reduce((a, b) => (a[b] = (a[b]||0)+1, a), {});
             let destino = 'Puy du fou';
-
             if (puntos.tranquilo && puntos.naturaleza) destino = 'Sierra de Cazorla 🌲';
             else if (puntos.ciudad && puntos.urbano) destino = 'Málaga 🐟';
             else if (puntos.historia && puntos.misterioso) destino = 'Córdoba 🕌';
             else if (puntos.relax && puntos.acogedor) destino = 'Sierra de Aracena 🛏️';
-            else if (puntos.aventura && puntos.fantasia) destino = 'Comunidad Valenciana 🏙️';
+            else if (puntos.aventura && puntos.fantasía) destino = 'Comunidad Valenciana 🏙️';
             else if (puntos.emocional && puntos.retirada) destino = 'Baños termanles de Granada 🌄';
             else if (puntos.acogedor && puntos.curioso) destino = 'Un café de especialidad en Oporto 📚';
             else if (puntos.acogedor && puntos.aventura) destino = 'Ruta por Sierra Nevada 🚐';
-            else if (puntos.naturaleza && puntos.fantasia) destino = 'Bosques de la Sierra de las Nieves 🧚';
+            else if (puntos.naturaleza && puntos.fantasía) destino = 'Bosques de la Sierra de las Nieves 🧚';
             else if (puntos.urbano && puntos.naturaleza) destino = 'El Parque del Retiro de Madrid 🌳';
-
             juego.innerHTML = `
                 <h2>✨ Tu destino ha sido revelado</h2>
-                <p style="font-size: 1.5rem; color: #f582ae">${destino}</p>
-              `;
-
-            // Crear y añadir el botón de reinicio
-            const replayBtn = document.createElement('button');
-            replayBtn.textContent = 'Volver a jugar';
-            replayBtn.id = 'replay-button'; // Asignar ID para el CSS
-            replayBtn.onclick = () => {
-                // Reiniciar el estado y empezar de nuevo
-                estado.atributos = [];
-                mostrarPaso(0);
-            };
-
-            juego.appendChild(replayBtn);
+                <p style="font-size:1.5rem; color:#f582ae">${destino}</p>`;
+            const btn = document.createElement('button');
+            btn.id = 'replay-button'; btn.textContent = 'Volver a jugar';
+            btn.onclick = () => { estado.atributos = []; mostrarPaso(0); };
+            juego.appendChild(btn);
         }
 
         mostrarPaso(0);
